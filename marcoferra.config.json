@@ -46,6 +46,19 @@
       "payment_methods": []
     },
     {
+      "slug": "extended-conversation",
+      "title": "Extended Conversation",
+      "description": "A free 60-minute call for a longer conversation. Time to go deeper on your goals, your questions and how we could work together.",
+      "summary": "Extended Conversation with Marco Ferra",
+      "duration_minutes": 60,
+      "buffer_minutes": 10,
+      "notice_hours": 24,
+      "horizon_days": 90,
+      "price_minor": 0,
+      "currency": "eur",
+      "payment_methods": []
+    },
+    {
       "slug": "focused-session",
       "title": "Focused Session",
       "description": "One challenge, one plan: a career decision, a difficult stakeholder, a leadership dilemma or interview preparation. Outcome: a concrete next step.",
