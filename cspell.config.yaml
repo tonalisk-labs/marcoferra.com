@@ -1,0 +1,16 @@
+# The site and its code are in British English. The words the dictionary misses but that are
+# right here are in words.en-GB.txt.
+version: '0.2'
+language: en-GB
+import:
+  - '@cspell/dict-en-gb/cspell-ext.json'
+dictionaryDefinitions:
+  - name: site
+    path: ./words.en-GB.txt
+dictionaries: [site]
+useGitignore: true
+ignorePaths:
+  - package-lock.json
+  - Cargo.lock
+  - web/public
+  - web/scripts/cards.lock.json

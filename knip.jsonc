@@ -1,0 +1,10 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    // html-validate reads its config, which no module imports.
+    ".": { "entry": [".htmlvalidate.mjs"] },
+    // kit's harness loads the site's adapter by its path. page-dates.ts is run by hand, once, as
+    // the repository becomes one root commit.
+    "web": { "entry": ["tests/app.ts", "scripts/page-dates.ts"] },
+  },
+}

@@ -1,0 +1,28 @@
+---
+import { DISPLAY, LEAD } from '@tonalisk-labs/kit/theme';
+
+import { eventTypes } from '../../booking/event-types.ts';
+import EventTypeCard from '../../components/event-type-card.astro';
+import Layout from '../../layouts/layout.astro';
+---
+
+<Layout
+  title="Book a meeting with Marco Ferra"
+  description="Choose a kind of meeting, then a day and a time for a video call with Marco Ferra. The invitation arrives by email."
+  image="book"
+>
+  <h1 class={DISPLAY}>Book a meeting</h1>
+  <p class={`mt-4 ${LEAD}`}>
+    Choose a kind of meeting, then a day and a time for a video call. The invitation, with its
+    video link, arrives by email.
+  </p>
+  <ul id="event-types" class="mt-8 grid gap-6 sm:grid-cols-2">
+    {eventTypes().map((kind) => <EventTypeCard kind={kind} />)}
+  </ul>
+
+  <script>
+    import { carryQuery } from '../../lib/carry-query.ts';
+
+    carryQuery('#event-types a');
+  </script>
+</Layout>

@@ -1,0 +1,150 @@
+---
+import BodyFont from '@tonalisk-labs/kit/components/BodyFont.astro';
+import { button, FLOATING, POPOVER_MOTION } from '@tonalisk-labs/kit/theme';
+import { getImage } from 'astro:assets';
+import type { Thing } from 'schema-dts';
+
+import { LINK } from '../booking/classes.ts';
+import ThemeMenu from '../components/theme-menu.astro';
+import { CARDS, type CardName } from '../lib/cards.ts';
+import { EMAIL, LINKEDIN, siteJsonLd } from '../lib/json-ld.ts';
+import portraitSource from '../assets/marco-ferra.jpg';
+
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** The page's Open Graph image, under /og/. */
+  image?: CardName;
+  jsonLd?: readonly Thing[];
+  /** A page only a link from an email or Checkout leads to: kept out of the index. */
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  image,
+  jsonLd = [],
+  noindex = false,
+} = Astro.props;
+
+/** The portrait as a JPEG, the format every search engine reads, for `Person.image`. */
+const portrait = await getImage({ src: portraitSource, width: 600, format: 'jpg' });
+
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/cv/', label: 'CV' },
+  { href: '/work-with-me/', label: 'Work with me' },
+];
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const imageUrl = image === undefined ? undefined : new URL(`/og/${image}.png`, Astro.site).href;
+const linkClass = 'font-medium text-slate-900 underline-offset-4 hover:underline';
+const main = 'mx-auto w-full max-w-3xl flex-1 px-6 py-10 leading-relaxed';
+const linkFor = (href: string): string =>
+  Astro.url.pathname === href ? `${linkClass} underline` : linkClass;
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <BodyFont />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {
+      noindex ? (
+        <meta name="robots" content="noindex" />
+      ) : (
+        <link rel="canonical" href={canonical} />
+      )
+    }
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content="Marco Ferra" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:site_name" content="Marco Ferra" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {
+      image !== undefined && imageUrl !== undefined && (
+        <>
+          <meta property="og:image" content={imageUrl} />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta property="og:image:alt" content={CARDS[image].alt} />
+        </>
+      )
+    }
+    <meta name="twitter:card" content={imageUrl === undefined ? 'summary' : 'summary_large_image'} />
+    <script is:inline type="application/ld+json" set:html={siteJsonLd(Astro.site, new URL(portrait.src, Astro.site).href, jsonLd)} />
+  </head>
+  <body class="flex min-h-dvh flex-col bg-white text-slate-900 antialiased">
+    <header class="border-b border-slate-200 print:hidden">
+      <div class="mx-auto flex max-w-3xl items-center justify-between gap-6 px-6 py-4">
+        <a href="/" class="text-lg font-bold">Marco Ferra</a>
+        <nav aria-label="Main" class="hidden gap-6 sm:flex">
+          {
+            links.map(({ href, label }) => (
+              <a
+                href={href}
+                class={linkFor(href)}
+                aria-current={Astro.url.pathname === href ? 'page' : undefined}
+              >
+                {label}
+              </a>
+            ))
+          }
+        </nav>
+        <button
+          type="button"
+          popovertarget="menu"
+          class={`${button('light', 'sm')} sm:hidden`}
+        >
+          Menu
+        </button>
+        <nav
+          id="menu"
+          popover
+          aria-label="Menu"
+          class={`${FLOATING} ${POPOVER_MOTION} ms-auto mt-16 me-6 p-4`}
+        >
+          <ul class="flex flex-col gap-3">
+            {
+              links.map(({ href, label }) => (
+                <li>
+                  <a
+                    href={href}
+                    class={linkFor(href)}
+                    aria-current={Astro.url.pathname === href ? 'page' : undefined}
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main class={main}>
+      <slot />
+    </main>
+    <footer class="border-t border-slate-200 print:hidden">
+      <div
+        class="mx-auto flex max-w-3xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-6 text-sm text-slate-700"
+      >
+        <span>© Marco Ferra</span>
+        <a href={`mailto:${EMAIL}`} class={LINK}>{EMAIL}</a>
+        <a href={LINKEDIN} rel="me" class={LINK}>LinkedIn</a>
+        <a href="/privacy/" class={LINK}>Privacy</a>
+        <a href="/terms/" class={LINK}>Terms</a>
+        <ThemeMenu />
+      </div>
+    </footer>
+  </body>
+</html>

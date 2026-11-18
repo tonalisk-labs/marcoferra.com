@@ -1,0 +1,35 @@
+---
+// Its link spans the whole card, so a press anywhere on it chooses the type.
+import { BADGE, BADGE_TONES, button, CARD_LINK } from '@tonalisk-labs/kit/theme';
+
+import { durationOf, type EventType, priceOf } from '../booking/event-types.ts';
+
+interface Props {
+  kind: EventType;
+  /** The card's heading, a level below the page's or section's own. */
+  level?: 'h2' | 'h3';
+}
+
+const { kind, level: Heading = 'h2' } = Astro.props;
+const heading = `type-${kind.slug}`;
+---
+
+<li>
+  <article aria-labelledby={heading} class={`${CARD_LINK} relative flex h-full flex-col gap-3`}>
+    <Heading id={heading} class="text-xl font-semibold tracking-tight">{kind.title}</Heading>
+    <p class="text-slate-700">{kind.description}</p>
+    <ul class="flex flex-wrap gap-2">
+      <li class={`${BADGE} ${BADGE_TONES.secondary}`}>{durationOf(kind)}</li>
+      <li class={`${BADGE} ${BADGE_TONES.secondary}`}>{priceOf(kind)}</li>
+    </ul>
+    <p class="mt-auto">
+      <a
+        href={`/book/${kind.slug}/`}
+        class={`${button('primary')} after:absolute after:inset-0 after:rounded-2xl`}
+        aria-label={`Choose a time for: ${kind.title}`}
+      >
+        Choose a time
+      </a>
+    </p>
+  </article>
+</li>

@@ -1,0 +1,51 @@
+[graph]
+all-features = true
+
+[advisories]
+version = 2
+# Unmaintained alone, with no known flaw, each by its ID and gone once its holder moves off it.
+ignore = [
+  { id = "RUSTSEC-2026-0543", reason = "chrono, unmaintained, reached only through icalendar 0.17.17, the invitations' writer and its latest release" },
+]
+yanked = "deny"
+
+# Permissive only. A copyleft crate reaching a shipped binary is a licensing decision, not a
+# dependency bump, so it stops CI until it is made deliberately.
+[licenses]
+version = 2
+allow = [
+  "MIT",
+  "Apache-2.0",
+  "Apache-2.0 WITH LLVM-exception",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "ISC",
+  "Unicode-3.0",
+  "Zlib",
+  # Mozilla's root certificates, as data: webpki-root-certs, which reqwest brings through rustls.
+  "CDLA-Permissive-2.0",
+  # Public-domain equivalent: strictly more permissive than MIT.
+  "0BSD",
+]
+confidence-threshold = 0.9
+# The list is kit's policy for every repo, not this tree's inventory: a licence no crate here
+# uses yet stays allowed.
+unused-allowed-license = "allow"
+
+[bans]
+multiple-versions = "deny"
+wildcards = "deny"
+# A second version of a crate builds twice and patches apart: each here is one an upstream still
+# holds, said which, and dropped once it moves. Any other fails the check.
+skip = [
+  { crate = "base64@0.22.1", reason = "aws_lambda_events and lambda_runtime, under lambda_http" },
+  { crate = "getrandom@0.2.17", reason = "ring" },
+  { crate = "hashbrown@0.16.1", reason = "governor, under kit-server" },
+  { crate = "syn@2.0.119", reason = "axum-macros, tracing-attributes and seven more derives" },
+  { crate = "windows-sys@0.52.0", reason = "ring" },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-git = ["https://github.com/tonalisk-labs/kit"]

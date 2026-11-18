@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  pull_request:
+  # A push to main runs the check too, so its caches, which every pull request reads, stay filled.
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  # Each run its own group, so a newer push never cancels another, queued or running.
+  group: ${{ github.workflow }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+# kit's workflow bounds each of its jobs with timeout-minutes, which a calling job can't set.
+jobs:
+  checks:
+    uses: tonalisk-labs/kit/.github/workflows/checks.yml@cfafe9eddb9b08515279536929f188aeda20d8d7 # v1.1.0
+    permissions:
+      contents: read # to check out the code
+      pull-requests: read # to read the pull request's title

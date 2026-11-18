@@ -1,0 +1,110 @@
+{
+  "domains": {
+    "apex": "marcoferra.com",
+    "www": "www.marcoferra.com",
+    "public_base_url": "https://www.marcoferra.com"
+  },
+  "network": {
+    "bind_addr": "127.0.0.1:8080",
+    "client_ip_header": "cloudfront-viewer-address"
+  },
+  "booking": {
+    "host_time_zone": "Europe/Lisbon",
+    "weekdays": [1, 2, 3, 4, 5],
+    "first_start_hour": 10,
+    "last_end_hour": 17,
+    "start_every_minutes": 30,
+    "hold_minutes": 30,
+    "refund_until_hours": 24,
+    "withdrawal_days": 14
+  },
+  "event_types": [
+    {
+      "slug": "intro",
+      "title": "Introductory Call",
+      "description": "A free 15-minute introductory call. We clarify your goal, assess where you stand and agree how to work together.",
+      "summary": "Introductory Call with Marco Ferra",
+      "duration_minutes": 15,
+      "buffer_minutes": 5,
+      "notice_hours": 24,
+      "horizon_days": 90,
+      "price_minor": 0,
+      "currency": "eur",
+      "payment_methods": []
+    },
+    {
+      "slug": "role-conversation",
+      "title": "Role Conversation",
+      "description": "A free 20-minute call for recruiters and hiring managers about a specific role. A short brief comes with the booking, so the time goes on scope and fit.",
+      "summary": "Role Conversation with Marco Ferra",
+      "duration_minutes": 20,
+      "buffer_minutes": 10,
+      "notice_hours": 24,
+      "horizon_days": 90,
+      "price_minor": 0,
+      "currency": "eur",
+      "payment_methods": []
+    },
+    {
+      "slug": "focused-session",
+      "title": "Focused Session",
+      "description": "One challenge, one plan: a career decision, a difficult stakeholder, a leadership dilemma or interview preparation. Outcome: a concrete next step.",
+      "summary": "Focused Session with Marco Ferra",
+      "duration_minutes": 30,
+      "buffer_minutes": 10,
+      "notice_hours": 24,
+      "horizon_days": 90,
+      "price_minor": 4000,
+      "currency": "eur",
+      "payment_methods": ["card", "mb_way", "paypal"]
+    },
+    {
+      "slug": "mock-interview",
+      "title": "Mock Interview",
+      "description": "A realistic interview for management, programme or delivery leadership roles, with structured feedback on content, evidence and presence.",
+      "summary": "Mock Interview with Marco Ferra",
+      "duration_minutes": 45,
+      "buffer_minutes": 10,
+      "notice_hours": 24,
+      "horizon_days": 90,
+      "price_minor": 8000,
+      "currency": "eur",
+      "payment_methods": ["card", "mb_way", "paypal"]
+    },
+    {
+      "slug": "working-session",
+      "title": "Working Session",
+      "description": "A 60-minute working session for a promotion case, a first-90-days plan or a stakeholder strategy. Outcome: a clear plan and agreed actions.",
+      "summary": "Working Session with Marco Ferra",
+      "duration_minutes": 60,
+      "buffer_minutes": 10,
+      "notice_hours": 24,
+      "horizon_days": 90,
+      "price_minor": 12000,
+      "currency": "eur",
+      "payment_methods": ["card", "mb_way", "paypal"]
+    }
+  ],
+  "limits": {
+    "name_max_chars": 120,
+    "email_max_chars": 254,
+    "message_max_chars": 2000,
+    "body_max_bytes": 8192,
+    "min_fill_seconds": 3,
+    "form_token_max_age_minutes": 120,
+    "availability_cache_seconds": 60
+  },
+  "rate_limits": {
+    "bookings_per_ip_per_hour": 5,
+    "daily_send_cap": 50
+  },
+  "email": {
+    "host": "smtp.maileroo.com",
+    "port": 587,
+    "from": "Marco Ferra <hello@marcoferra.com>",
+    "organizer": "hello@marcoferra.com"
+  },
+  "google": {
+    "calendar_id": "primary"
+  }
+}

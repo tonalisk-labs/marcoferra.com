@@ -1,0 +1,32 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Rust build output
+/target/
+
+# release output
+/out/
+/pages/
+
+# The site's build output and the types Astro generates
+/web/dist/
+/web/.astro/
+
+# The client orval generates from server/openapi.yaml
+/web/src/api/endpoints.ts
+
+# Logs, environment files, and what macOS and JetBrains IDEs leave behind
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env
+.env.production
+.DS_Store
+.idea/

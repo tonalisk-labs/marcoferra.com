@@ -1,0 +1,38 @@
+[package]
+name = "marcoferra-server"
+description = "Meeting booking for marcoferra.com: Google Calendar availability, invitations by email."
+version = "1.0.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "export-openapi"
+path = "src/bin/export-openapi.rs"
+
+[dependencies]
+axum = { workspace = true }
+base64 = { workspace = true }
+hmac = { workspace = true }
+icalendar = { workspace = true }
+jiff = { workspace = true }
+kit-server = { workspace = true }
+lambda_http = { workspace = true }
+lettre = { workspace = true }
+reqwest = { workspace = true }
+secrecy = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+tokio = { workspace = true, features = ["net"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+utoipa = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+icalendar = { workspace = true, features = ["parser"] }

@@ -1,0 +1,117 @@
+---
+import { button, DISPLAY } from '@tonalisk-labs/kit/theme';
+
+import site from '../../../../marcoferra.config.json' with { type: 'json' };
+import { LINK, TEXT_LINK } from '../../booking/classes.ts';
+import Layout from '../../layouts/layout.astro';
+
+const { refund_until_hours: hours, withdrawal_days: days } = site.booking;
+---
+
+<Layout
+  title="Cancel a meeting with Marco Ferra"
+  description="Cancel a meeting booked on marcoferra.com, from the link in its invitation."
+  image="book"
+  noindex
+>
+  <h1 class={DISPLAY}>Cancel a meeting</h1>
+  <form id="cancel" class="mt-6 flex flex-col items-start gap-4" hidden>
+    <p class="text-slate-700">
+      Cancelling frees the time and emails you a cancellation, which removes the meeting from your
+      calendar.
+    </p>
+    <p id="refund-full" class="font-medium" hidden>
+      This meeting is paid for: cancelling now refunds your payment in full.
+    </p>
+    <p id="refund-none" class="font-medium" hidden>
+      This meeting is paid for: cancelling now is not refunded, as more than {days} days have passed
+      since you booked it and it starts in less than {hours} hours (<a
+        href="/terms/#cancellation"
+        class={TEXT_LINK}>terms</a
+      >).
+    </p>
+    <p id="refund-unknown" class="text-slate-700" hidden>
+      If you paid for this meeting, the <a href="/terms/#cancellation" class={TEXT_LINK}>terms</a> say
+      what a cancellation refunds.
+    </p>
+    <button type="submit" class={button('danger')}>
+      Cancel the meeting
+    </button>
+  </form>
+  <p id="outcome" role="status" class="mt-6 font-medium">
+    Use the cancellation link from your invitation email.
+  </p>
+  <p class="mt-6"><a href="/book/" class={LINK}>Book another time</a></p>
+
+  <script>
+    import { cancelBooking, type cancelBookingResponse } from '../../api/endpoints.ts';
+    import { eventTypes, money } from '../../booking/event-types.ts';
+    import { failureOf } from '../../booking/requests.ts';
+
+    const CANCELLED = 'The meeting is cancelled. The cancellation is on its way to your inbox.';
+
+    const said = (reply: cancelBookingResponse): string => {
+      if (reply.status === 200) {
+        const { refundedMinor, currency } = reply.data;
+        return refundedMinor > 0
+          ? `${CANCELLED} Your payment of ${money(refundedMinor, currency)} is refunded in full.`
+          : CANCELLED;
+      }
+      if (reply.status === 410) {
+        return 'This meeting was already cancelled.';
+      }
+      return reply.data.detail ?? reply.data.title;
+    };
+
+    const form = globalThis.document.querySelector<HTMLFormElement>('#cancel');
+    const outcome = globalThis.document.querySelector<HTMLElement>('#outcome');
+    const query = new URLSearchParams(globalThis.location.search);
+    const [id, token, type] = [query.get('id'), query.get('token'), query.get('type')];
+    /** The last moment, in Unix seconds, a cancellation is refunded, for a paid type's link. */
+    const signed = query.get('refund');
+    const refund = signed === null ? signed : Number(signed);
+
+    /** The refund note the link calls for: none for a free type, this booking's outcome for a
+     *  paid one, a neutral one when it names neither; the server decides the refund itself. */
+    const refundNote = (): string | undefined => {
+      const kind = eventTypes().find(({ slug }) => slug === type);
+      if (kind !== undefined && kind.price_minor === 0) {
+        return undefined;
+      }
+      if (kind === undefined || refund === null || Number.isNaN(refund)) {
+        return '#refund-unknown';
+      }
+      return Date.now() < refund * 1000 ? '#refund-full' : '#refund-none';
+    };
+
+    const showRefundNote = (): void => {
+      const note = refundNote();
+      if (note === undefined) {
+        return;
+      }
+      const shown = globalThis.document.querySelector<HTMLElement>(note);
+      if (shown !== null) {
+        shown.hidden = false;
+      }
+    };
+
+    if (form !== null && outcome !== null && id !== null && token !== null) {
+      outcome.textContent = '';
+      form.hidden = false;
+      showRefundNote();
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        form.hidden = true;
+        outcome.textContent = 'Cancelling…';
+        cancelBooking(id, { token, type, refund })
+          .then((reply) => {
+            outcome.textContent = said(reply);
+          })
+          .catch((error: unknown) => {
+            outcome.textContent = failureOf(error);
+            form.hidden = false;
+          });
+      });
+    }
+  </script>
+</Layout>

@@ -1,0 +1,147 @@
+---
+import { DISPLAY } from '@tonalisk-labs/kit/theme';
+
+import site from '../../../marcoferra.config.json' with { type: 'json' };
+import { TEXT_LINK } from '../booking/classes.ts';
+import { durationOf, eventTypes, methodsOf, paidTypes, priceOf } from '../booking/event-types.ts';
+import Section from '../components/section.astro';
+import Layout from '../layouts/layout.astro';
+import { EMAIL } from '../lib/json-ld.ts';
+
+const ADDRESS = 'Av. Dom João II, 52, Piso 0, 1990-096 Lisboa, Portugal';
+const {
+  hold_minutes: holdMinutes,
+  refund_until_hours: refundHours,
+  withdrawal_days: withdrawalDays,
+} = site.booking;
+const [firstPaid] = paidTypes();
+---
+
+<Layout
+  title="Terms of use, marcoferra.com"
+  description="The terms that apply when you book a free or paid session on marcoferra.com: prices, payment, cancellation, refunds and your right of withdrawal."
+  image="terms"
+>
+  <article class="flex flex-col gap-6">
+    <h1 class={DISPLAY}>Terms of use</h1>
+    <p class="text-slate-700">Last updated 8 October 2026.</p>
+
+    <Section id="provider" title="Who provides the service">
+      <p>
+        Marco Ferra, {ADDRESS}, reachable at
+        <a href={`mailto:${EMAIL}`} class={TEXT_LINK}>{EMAIL}</a>. These terms apply to every
+        session booked on this site.
+      </p>
+    </Section>
+
+    <Section id="service" title="The booking service">
+      <p>
+        You can book a video call with Marco Ferra at a free time on this site. A free session is
+        booked once its invitation has been sent to your email address. A paid session is booked
+        once its payment is confirmed. The invitation then follows by email. Every invitation
+        carries the Google Meet link and a link to cancel. Sessions cannot be moved: to change the
+        time, cancel and book another, under the cancellation terms below.
+      </p>
+    </Section>
+
+    <Section id="prices" title="Sessions and prices">
+      <ul class="flex list-disc flex-col gap-2 ps-5">
+        {
+          eventTypes().map((kind) => (
+            <li>
+              <strong>{kind.title}</strong>: {durationOf(kind)}, {priceOf(kind)}.
+            </li>
+          ))
+        }
+      </ul>
+      <p>
+        Prices are final. No VAT is charged: IVA, regime de isenção, art. 53.º do CIVA. An
+        invoice-receipt (fatura-recibo) is issued for every paid session, and Stripe emails its own
+        payment receipt.
+      </p>
+    </Section>
+
+    <Section id="payment" title="Payment">
+      <p>
+        A paid session is paid in advance on Stripe's secure checkout page{
+          firstPaid === undefined ? '' : `, by ${methodsOf(firstPaid)}`
+        }. The time you chose is held for {holdMinutes} minutes while you pay. If the payment is not
+        completed, the hold ends and nothing is charged. Card and account details are entered on
+        Stripe's page only and never reach this site. If a payment arrives after its time was
+        released or taken, it is refunded in full.
+      </p>
+    </Section>
+
+    <Section id="cancellation" title="Cancellation and refunds">
+      <p>
+        You can cancel any session from the link in its invitation. A paid session is refunded in
+        full, automatically and to the way you paid, when you cancel it before it starts and either
+        within {withdrawalDays} days of booking it or at least {refundHours} hours before it
+        starts. A paid session cancelled later than both, or missed, is not refunded. The
+        cancellation page says which applies before you confirm. If Marco Ferra has to cancel a
+        session, you are told by email and refunded in full.
+      </p>
+    </Section>
+
+    <Section id="withdrawal" title="Your right of withdrawal">
+      <p>
+        If you book as a consumer, you may withdraw from the contract within {withdrawalDays} days
+        of booking without giving a reason, as long as the session has not taken place: cancel it
+        from the link in its invitation, or write to
+        <a href={`mailto:${EMAIL}`} class={TEXT_LINK}>{EMAIL}</a>. The payment is then refunded in
+        full, to the way you paid.
+      </p>
+      <p>
+        When you book a paid session that takes place within those {withdrawalDays} days, you
+        expressly ask for it to be provided during the withdrawal period, and you acknowledge that
+        you lose the right of withdrawal once the session has been given in full (Directive
+        2011/83/EU, art. 16(m), and Decreto-Lei n.º 24/2014, art. 17.º). The booking form asks you to
+        confirm this, and the confirmation email records it.
+      </p>
+    </Section>
+
+    <Section id="use" title="Fair use">
+      <p>
+        Give your own name and an address you can read. Do not book on someone else's behalf
+        without their consent, send unsolicited messages, or try to exhaust the service. A booking
+        made in bad faith may be cancelled, and repeated requests are limited.
+      </p>
+    </Section>
+
+    <Section id="liability" title="Liability">
+      <p>
+        Sessions are advice given in good faith. Decisions taken after them remain yours. To the
+        extent the law allows, Marco Ferra is not liable for indirect loss arising from the service.
+        Nothing in these terms limits the rights consumer law gives you.
+      </p>
+    </Section>
+
+    <Section id="others" title="Services it relies on">
+      <p>
+        The site is hosted on GitHub Pages behind AWS CloudFront, bookings run on AWS Lambda, are
+        kept in Google Calendar with a Google Meet link, payments are taken by Stripe, and emails
+        are sent through Maileroo. The
+        <a href="/privacy/" class={TEXT_LINK}>privacy policy</a> says what each of them handles.
+      </p>
+    </Section>
+
+    <Section id="complaints" title="Complaints and disputes">
+      <p>
+        Write first to <a href={`mailto:${EMAIL}`} class={TEXT_LINK}>{EMAIL}</a>. You may also
+        complain in the
+        <a href="https://www.livroreclamacoes.pt/" class={TEXT_LINK}>Livro de Reclamações Eletrónico</a
+        >. A consumer dispute may be taken to a Portuguese consumer arbitration centre, such as the
+        Centro de Arbitragem de Conflitos de Consumo de Lisboa. The full list of alternative
+        dispute resolution bodies is kept by the Direção-Geral do Consumidor at
+        <a href="https://www.consumidor.gov.pt/" class={TEXT_LINK}>consumidor.gov.pt</a>.
+      </p>
+    </Section>
+
+    <Section id="law" title="Law">
+      <p>
+        These terms are governed by Portuguese law, without prejudice to the consumer protection
+        your own country gives you.
+      </p>
+    </Section>
+  </article>
+</Layout>

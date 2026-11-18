@@ -1,0 +1,9 @@
+{
+  "extends": ["astro/tsconfigs/strictest", "@tonalisk-labs/kit/tsconfig.json"],
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+  }
+}

@@ -1,0 +1,68 @@
+---
+import { CARD, DISPLAY, LEAD } from '@tonalisk-labs/kit/theme';
+
+import { ROLE_TYPE } from '../booking/brief.ts';
+import { TEXT_LINK } from '../booking/classes.ts';
+import { eventTypes } from '../booking/event-types.ts';
+import EventTypeCard from '../components/event-type-card.astro';
+import Section from '../components/section.astro';
+import Layout from '../layouts/layout.astro';
+import { EMAIL } from '../lib/json-ld.ts';
+
+const kinds = eventTypes();
+const role = kinds.find(({ slug }) => slug === ROLE_TYPE);
+// A renamed or removed type would close the Roles door and drop the brief: the build stops.
+if (role === undefined) {
+  throw new Error(`marcoferra.config.json: event_types has no ${ROLE_TYPE}`);
+}
+const advisory = kinds.filter(({ slug }) => slug !== ROLE_TYPE);
+---
+
+<Layout
+  title="Work with Marco Ferra: roles and advisory"
+  description="Work with Marco Ferra: a free 20-minute Role Conversation for recruiters and hiring managers, or advisory sessions on delivery, careers and leadership."
+  image="work-with-me"
+>
+  <h1 class={DISPLAY}>Work with me</h1>
+  <p class={`mt-4 ${LEAD}`}>Two doors, each with a clear first step.</p>
+
+  <div id="doors">
+    <Section id="roles" title="Roles" class="mt-10">
+      <p>For recruiters and hiring managers with a delivery, programme or transformation role to fill.</p>
+      <p>
+        Book a free 20-minute Role Conversation. The booking takes a short brief: company, role
+        title, level, location and, if you can share it, the range. We spend the time on scope and
+        fit, and you leave knowing whether a next step makes sense.
+      </p>
+      <ul class="mt-4 grid gap-6 sm:grid-cols-2">
+        <EventTypeCard kind={role} level="h3" />
+        <li>
+          <article aria-labelledby="full-cv" class={`${CARD} flex h-full flex-col gap-3`}>
+            <h3 id="full-cv" class="text-xl font-semibold tracking-tight">Full CV on request</h3>
+            <p class="text-slate-700">
+              Write to <a href={`mailto:${EMAIL}?subject=Full%20CV`} class={TEXT_LINK}>{EMAIL}</a>
+              and I send the full CV, with detail on every role.
+            </p>
+          </article>
+        </li>
+      </ul>
+    </Section>
+
+    <Section id="advisory" title="Advisory" class="mt-10">
+      <p>For leaders and teams who want an experienced view on delivery, careers or leadership.</p>
+      <p>
+        Start with a free introductory call, or go straight to a session. Prices, payment and
+        cancellation are in the <a href="/terms/" class={TEXT_LINK}>terms</a>.
+      </p>
+      <ul class="mt-4 grid gap-6 sm:grid-cols-2">
+        {advisory.map((kind) => <EventTypeCard kind={kind} level="h3" />)}
+      </ul>
+    </Section>
+  </div>
+
+  <script>
+    import { carryQuery } from '../lib/carry-query.ts';
+
+    carryQuery('#doors a[href^="/book/"]');
+  </script>
+</Layout>

@@ -1,0 +1,63 @@
+---
+import { BADGE, BADGE_TONES, DISPLAY, LEAD } from '@tonalisk-labs/kit/theme';
+import { createHash } from 'node:crypto';
+
+import { getGetAvailabilityUrl } from '../../api/endpoints.ts';
+import Booking from '../../booking/booking.tsx';
+import { TEXT_LINK } from '../../booking/classes.ts';
+import { earlyRead } from '../../booking/early-read.ts';
+import {
+  durationOf,
+  type EventType,
+  eventTypes,
+  methodsOf,
+  priceOf,
+} from '../../booking/event-types.ts';
+import Layout from '../../layouts/layout.astro';
+
+interface Props {
+  kind: EventType;
+}
+
+// An invalid meeting type in marcoferra.config.json stops the build here.
+export const getStaticPaths = (): { params: { slug: string }; props: Props }[] =>
+  eventTypes().map((kind) => ({ params: { slug: kind.slug }, props: { kind } }));
+
+const { kind } = Astro.props;
+const early = earlyRead(getGetAvailabilityUrl({ type: kind.slug }));
+if (Astro.csp !== undefined) {
+  Astro.csp.insertScriptHash(`sha256-${createHash('sha256').update(early).digest('base64')}`);
+}
+---
+
+<Layout
+  title={`${kind.title} with Marco Ferra`}
+  description={kind.description}
+  image="book"
+>
+  <h1 class={DISPLAY}>{kind.title}</h1>
+  <p class={`mt-4 ${LEAD}`}>
+    {kind.description} Choose a day and a time for the video call. The invitation, with its video
+    link, arrives by email.
+  </p>
+  <ul class="mt-4 flex flex-wrap gap-2">
+    <li class={`${BADGE} ${BADGE_TONES.secondary}`}>{durationOf(kind)}</li>
+    <li class={`${BADGE} ${BADGE_TONES.secondary}`}>{priceOf(kind)}</li>
+  </ul>
+  {
+    kind.price_minor > 0 && (
+      <p class="mt-2 text-slate-700">
+        You pay on Stripe's secure page by {methodsOf(kind)}. The time is held for you while you
+        pay. No VAT is charged (art. 53.º CIVA). See the
+        <a href="/terms/#cancellation" class={TEXT_LINK}>terms</a> for cancellation and refunds.
+      </p>
+    )
+  }
+  <script is:inline set:html={early} />
+  <!-- The calendar and form arrive after the page: their room is kept, so nothing below moves. -->
+  <div class="min-h-screen">
+    <Booking client:only="react" type={kind.slug}>
+      <p slot="fallback" class="mt-8 text-slate-700">Loading the free times…</p>
+    </Booking>
+  </div>
+</Layout>

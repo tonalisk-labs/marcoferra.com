@@ -1,0 +1,4 @@
+{
+  "extends": "@tonalisk-labs/kit/tsconfig.json",
+  "include": ["playwright.config.ts"]
+}

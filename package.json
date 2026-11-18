@@ -1,0 +1,34 @@
+{
+  "name": "marcoferra.com",
+  "private": true,
+  "description": "Marco Ferra's site, marcoferra.com, and its booking API.",
+  "license": "MIT",
+  "workspaces": [
+    "web"
+  ],
+  "type": "module",
+  "scripts": {},
+  "devDependencies": {
+    "@cspell/dict-en-gb": "5.0.38",
+    "@playwright/test": "1.65.1",
+    "@tonalisk-labs/kit": "1.1.0",
+    "@types/node": "^26.6.6",
+    "cspell": "10.5.1",
+    "html-validate": "11.21.1",
+    "knip": "6.45.1",
+    "oxfmt": "0.78.0",
+    "oxlint": "1.93.0",
+    "oxlint-tsgolint": "7.0.2007",
+    "typescript": "^7.0.2"
+  },
+  "overrides": {
+    "@scalar/json-magic@<0.17.0": {
+      "undici": "^7.30.1"
+    },
+    "oxc-transform-react": "^0.158.0"
+  },
+  "allowScripts": {
+    "esbuild": false,
+    "fsevents": false
+  }
+}

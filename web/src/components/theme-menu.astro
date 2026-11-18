@@ -1,0 +1,24 @@
+---
+import { choices } from '@tonalisk-labs/kit/theme';
+import { themeConfig } from 'virtual:@tonalisk-labs/kit/themes';
+---
+
+{
+  themeConfig.userThemes && (
+    <label class="flex items-center gap-2">
+      Colour theme
+      <select data-theme-menu class="rounded-md border border-slate-400 bg-white px-2 py-1 pointer-coarse:min-h-11">
+        {choices(themeConfig).map(({ id, label }) => (
+          <option value={id}>{label}</option>
+        ))}
+      </select>
+    </label>
+  )
+}
+
+<script>
+  import { bindThemeMenus } from '@tonalisk-labs/kit/theme';
+  import { themeConfig } from 'virtual:@tonalisk-labs/kit/themes';
+
+  bindThemeMenus(themeConfig);
+</script>

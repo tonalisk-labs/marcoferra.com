@@ -1,0 +1,106 @@
+[workspace]
+resolver = "3"
+members = ["server"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.99"
+license = "MIT"
+publish = false
+
+[workspace.dependencies]
+# The version beside the tag, so cargo-deny holds it like any other dependency.
+kit-server = { git = "https://github.com/tonalisk-labs/kit", tag = "v1.1.0", version = "1.1.0" }
+axum = { version = "0.8.9", features = ["macros"] }
+base64 = "0.23.1"
+hmac = "0.13.0"
+# The writer alone; the parser only reads invitations back in tests.
+icalendar = { version = "0.17.15", default-features = false }
+# The tz database compiled in, so the booking grid never depends on the host's zoneinfo.
+jiff = { version = "0.2.38", default-features = false, features = [
+  "std",
+  "serde",
+  "tzdb-bundle-always",
+] }
+# Function URLs send the API Gateway HTTP (v2) payload; no other event shape is compiled.
+lambda_http = { version = "1.3.1", default-features = false, features = ["apigw_http"] }
+lettre = { version = "0.11.24", default-features = false, features = [
+  "builder",
+  "hostname",
+  "pool",
+  "smtp-transport",
+  "tokio1",
+  "tokio1-rustls",
+  "ring",
+  "rustls-native-certs",
+] }
+reqwest = { version = "0.13.5", default-features = false, features = [
+  "rustls",
+  "json",
+  "form",
+  "http2",
+] }
+secrecy = "0.10.3"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha2 = "0.11.0"
+tokio = { version = "1.53.2", features = ["macros", "rt-multi-thread", "signal", "sync", "time"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+utoipa = { version = "6.0.0", features = ["axum_extras", "yaml"] }
+uuid = { version = "1.27.0", features = ["v7", "serde"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+warnings = { level = "deny", priority = -1 }
+future_incompatible = { level = "deny", priority = -1 }
+rust_2018_idioms = { level = "deny", priority = -1 }
+unused = { level = "deny", priority = -1 }
+let_underscore_drop = "deny"
+missing_debug_implementations = "deny"
+non_ascii_idents = "deny"
+trivial_casts = "deny"
+trivial_numeric_casts = "deny"
+unreachable_pub = "deny"
+unused_qualifications = "deny"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
+nursery = { level = "deny", priority = -1 }
+cargo = { level = "deny", priority = -1 }
+# Every panicking path is denied by name; the shipped binary has no unwind path to reach.
+arithmetic_side_effects = "deny"
+expect_used = "deny"
+indexing_slicing = "deny"
+panic = "deny"
+string_slice = "deny"
+unwrap_used = "deny"
+dbg_macro = "deny"
+todo = "deny"
+unimplemented = "deny"
+unreachable = "deny"
+exit = "deny"
+mem_forget = "deny"
+str_to_string = "deny"
+verbose_file_reads = "deny"
+# pub(crate) trips this where plain pub trips rustc's unreachable_pub; pub(crate) is truthful.
+redundant_pub_crate = "allow"
+# Duplicate transitive versions are gated by deny.toml's [bans], not per crate.
+multiple_crate_versions = "allow"
+# A doc comment says what the code can't; a plain Result or panic-free code needs none.
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+
+[profile.release]
+lto = true
+codegen-units = 1
+overflow-checks = true
+strip = true
+
+# The release build with the names and lines a profiler shows, built into target/profiling, so it
+# can never stand in for what ships.
+[profile.profiling]
+inherits = "release"
+debug = "line-tables-only"
+strip = "none"

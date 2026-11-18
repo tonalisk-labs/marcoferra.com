@@ -1,0 +1,8 @@
+# Written by Copier; edit through `uvx copier update`, not by hand.
+_commit: v1.1.0
+_src_path: gh:tonalisk-labs/kit
+description: Marco Ferra's site, marcoferra.com, and its booking API.
+name: marcoferra.com
+pages: true
+private: false
+rust: true

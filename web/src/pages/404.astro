@@ -1,0 +1,19 @@
+---
+import { button, DISPLAY, LEAD } from '@tonalisk-labs/kit/theme';
+
+import Layout from '../layouts/layout.astro';
+---
+
+<Layout
+  title="Page not found: Marco Ferra"
+  description="This page is not on marcoferra.com. The CV, the talks and Work with me are one click away."
+  noindex
+>
+  <h1 class={DISPLAY}>This page isn't here</h1>
+  <p class={`mt-4 ${LEAD}`}>The link may be old, or the page has moved. These are one click away.</p>
+  <p class="mt-8 flex flex-wrap gap-4">
+    <a href="/" class={button('primary')}>Home</a>
+    <a href="/cv/" class={button('light')}>CV</a>
+    <a href="/work-with-me/" class={button('light')}>Work with me</a>
+  </p>
+</Layout>

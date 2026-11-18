@@ -1,0 +1,34 @@
+---
+import { DISPLAY } from '@tonalisk-labs/kit/theme';
+
+import { LINK } from '../../../booking/classes.ts';
+import Done from '../../../booking/done.tsx';
+import { type EventType, paidTypes } from '../../../booking/event-types.ts';
+import Layout from '../../../layouts/layout.astro';
+
+interface Props {
+  kind: EventType;
+}
+
+// Only a paid type returns from Checkout.
+export const getStaticPaths = (): { params: { slug: string }; props: Props }[] =>
+  paidTypes().map((kind) => ({ params: { slug: kind.slug }, props: { kind } }));
+
+const { kind } = Astro.props;
+---
+
+<Layout
+  title={`${kind.title} booked with Marco Ferra`}
+  description={`Your payment for the ${kind.title} is confirmed and the invitation sent by email.`}
+  image="book"
+  noindex
+>
+  <h1 class={DISPLAY}>{kind.title}</h1>
+  {/* Astro writes its islands' <style> just before the first island, so inside this wrapper. */}
+  <div>
+    <Done client:only="react">
+      <p slot="fallback" class="mt-8 text-slate-700">Confirming your payment…</p>
+    </Done>
+  </div>
+  <p class="mt-6"><a href="/book/" class={LINK}>Book another meeting</a></p>
+</Layout>

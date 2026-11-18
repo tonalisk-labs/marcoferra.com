@@ -1,0 +1,6 @@
+# Vulnerability disclosure (RFC 9116). Report issues privately; please do not
+# open a public issue for security problems.
+Contact: mailto:hello@marcoferra.com
+Expires: 2027-07-31T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://www.marcoferra.com/.well-known/security.txt

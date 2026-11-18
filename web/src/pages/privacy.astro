@@ -1,0 +1,78 @@
+---
+// What GDPR Art. 13 requires a site to tell, and Google's Limited Use statement for the calendar.
+import { DISPLAY } from '@tonalisk-labs/kit/theme';
+
+import { TEXT_LINK } from '../booking/classes.ts';
+import Section from '../components/section.astro';
+import Layout from '../layouts/layout.astro';
+import { EMAIL } from '../lib/json-ld.ts';
+---
+
+<Layout
+  title="Privacy policy, marcoferra.com"
+  description="What marcoferra.com collects when you book a meeting, why, for how long, and your rights."
+  image="privacy"
+>
+  <article class="flex flex-col gap-6">
+    <h1 class={DISPLAY}>Privacy policy</h1>
+    <p class="text-slate-700">Last updated 10 October 2026.</p>
+
+    <Section id="who" title="Who is responsible">
+      <p>
+        Marco Ferra, in Portugal, is the controller of your data. Write to
+        <a href={`mailto:${EMAIL}`} class={TEXT_LINK}>{EMAIL}</a>.
+      </p>
+    </Section>
+
+    <Section id="what" title="What is collected, and why">
+      <ul class="flex list-disc flex-col gap-2 ps-5">
+        <li>
+          <strong>Browsing:</strong> no cookies, analytics or trackers. Your IP address is used to
+          deliver the pages and, for up to an hour, to stop abuse of the booking service (legitimate
+          interest, GDPR Art. 6(1)(f)).
+        </li>
+        <li>
+          <strong>Booking:</strong> your name, email address, time zone, the time you chose and any
+          message, including a Role Conversation's brief. They are used to hold the meeting and send
+          its emails (contract, Art. 6(1)(b)). You need to give your name and email address to book.
+        </li>
+        <li>
+          <strong>Paid sessions:</strong> the payment record, kept as Portuguese tax law requires
+          (Art. 6(1)(c)). Card details go to Stripe only.
+        </li>
+        <li>
+          <strong>Where you came from:</strong> if your link named where it was shared, that name is
+          kept with your booking, to learn which channels work (legitimate interest, Art. 6(1)(f)).
+        </li>
+      </ul>
+    </Section>
+
+    <Section id="processors" title="Who processes it">
+      <p>
+        GitHub and Amazon Web Services (hosting and the booking service), Google (calendar and
+        Meet), Stripe (payments), Maileroo (email) and Proton (replies). Where they process data outside the EEA, they do so under an adequacy decision, such as
+        the EU-US Data Privacy Framework, or Standard Contractual Clauses. Calendar data is handled
+        under the
+        <a href="https://developers.google.com/terms/api-services-user-data-policy" class={TEXT_LINK}
+          >Google API Services User Data Policy</a
+        >, including its Limited Use requirements. Nothing is sold or used for marketing.
+      </p>
+    </Section>
+
+    <Section id="how-long" title="How long it is kept">
+      <p>
+        Bookings until you ask for them to be deleted. Payment records for 10 years, as tax law
+        requires. IP addresses for an hour at most in the booking service, and for a short time in
+        the hosts' logs.
+      </p>
+    </Section>
+
+    <Section id="rights" title="Your rights">
+      <p>
+        You may ask to access, correct or delete your data, to restrict or object to its use, and to
+        receive it in a portable form, at <a href={`mailto:${EMAIL}`} class={TEXT_LINK}>{EMAIL}</a>.
+        You may also complain to the Portuguese supervisory authority, the CNPD.
+      </p>
+    </Section>
+  </article>
+</Layout>

@@ -1,0 +1,13 @@
+@import '@tonalisk-labs/kit/theme.css';
+
+/* The CV prints as one plain column; an ATS reads ligatures as unknown glyphs. */
+@media print {
+  html {
+    font-size: 10.5pt;
+    font-variant-ligatures: none;
+  }
+
+  @page {
+    margin: 16mm 18mm;
+  }
+}

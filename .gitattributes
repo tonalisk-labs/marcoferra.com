@@ -1,0 +1,3 @@
+# Written by the server's exporter and the cards script, never by hand. Reviews fold them.
+server/openapi.yaml linguist-generated
+web/scripts/cards.lock.json linguist-generated

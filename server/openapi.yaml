@@ -1,0 +1,597 @@
+openapi: 3.2.0
+info:
+  title: marcoferra.com booking API
+  description: Books a meeting in the owner's Google Calendar and sends the invitation by email. Every refusal is RFC 9457 problem+json, and a typed one carries a `tag:marcoferra.com,2026:` type.
+  license:
+    name: MIT
+    identifier: MIT
+  version: 1.0.0
+servers:
+  - url: /api
+    description: The site's own origin
+paths:
+  /v1/availability:
+    get:
+      tags: []
+      summary: |-
+        Lists the times a visitor may book a meeting type at: the host's grid within the type's
+        rules, less what the calendar has busy.
+      operationId: get_availability
+      parameters:
+        - name: type
+          in: query
+          description: The meeting type's slug
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Bookable starts and a form token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Availability'
+        '400':
+          description: No such meeting type
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          description: The calendar is not answering
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /v1/bookings:
+    post:
+      tags: []
+      summary: |-
+        Books a start: 201 once the relay has a free type's invitation, or 202 with the Checkout that
+        pays for a paid type's held time. A repeated `Idempotency-Key` answers what it made.
+      operationId: create_booking
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          description: One per booking attempt, reused on retry
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingRequest'
+        required: true
+      responses:
+        '201':
+          description: Booked, and the invitation is on its way
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '202':
+          description: Held for payment at Stripe Checkout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Held'
+        '400':
+          description: Invalid. `errors` lists each member
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: The time was taken, the address holds a booking, or the key was reused
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '415':
+          description: The body is not JSON
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '429':
+          description: Too many requests from this address
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+                format: int64
+                minimum: 0
+              description: Seconds to wait
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          description: The calendar or the mail relay failed, so nothing was booked
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /v1/bookings/{id}:
+    get:
+      tags: []
+      summary: |-
+        A booking in its one representation (RFC 9110 §12.5.1): its invitation, byte for byte the
+        one its email carried.
+      operationId: get_booking
+      parameters:
+        - name: id
+          in: path
+          description: The booking's id
+          required: true
+          schema:
+            type: string
+        - name: token
+          in: query
+          description: The token from the booking's `icsUrl`
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The iCalendar invitation
+          content:
+            text/calendar:
+              schema:
+                type: string
+        '403':
+          description: The token does not open this booking
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: No such booking
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '406':
+          description: '`Accept` admits no `text/calendar`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '410':
+          description: Cancelled
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          description: The calendar is not answering
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /v1/bookings/{id}:cancel:
+    post:
+      tags: []
+      summary: |-
+        Cancels a meeting and sends the cancellation, which removes it from the visitor's calendar.
+        A paid meeting cancelled early enough is refunded in full first. Later, it is not refunded.
+      operationId: cancel_booking
+      parameters:
+        - name: id
+          in: path
+          description: The booking's id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelRequest'
+        required: true
+      responses:
+        '200':
+          description: Cancelled, and the cancellation sent. Says what was refunded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cancelled'
+        '400':
+          description: Invalid. `errors` lists each member
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: The token does not open this booking
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: No such booking
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '410':
+          description: Already cancelled
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '415':
+          description: The body is not JSON
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '429':
+          description: Too many requests from this address
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+                format: int64
+                minimum: 0
+              description: Seconds to wait
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          description: Stripe, the calendar or the mail relay failed, so the meeting stands
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /v1/bookings/{id}:release:
+    post:
+      tags: []
+      summary: |-
+        Gives up a time held for payment, from Checkout's way back: the session expires at Stripe
+        and the time is free again at once.
+      operationId: release_booking
+      parameters:
+        - name: id
+          in: path
+          description: The held booking's id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReleaseRequest'
+        required: true
+      responses:
+        '204':
+          description: Released, or already free
+        '400':
+          description: Invalid. `errors` lists each member
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: The token does not open this hold
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Already paid for, or its payment is under way
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '415':
+          description: The body is not JSON
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '429':
+          description: Too many requests from this address
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+                format: int64
+                minimum: 0
+              description: Seconds to wait
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          description: Stripe or the calendar failed. Try again
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /v1/bookings:confirm:
+    post:
+      tags: []
+      summary: |-
+        Confirms a paid booking from Stripe's success page, as the webhook would: the payment is
+        read back from Stripe, and the invitation sent once.
+      operationId: confirm_booking
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmRequest'
+        required: true
+      responses:
+        '200':
+          description: Booked, and the invitation sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '202':
+          description: Paid by a method that settles later. The invitation follows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPending'
+        '404':
+          description: No such payment
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Not paid, or paid too late and refunded
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '429':
+          description: Too many requests from this address
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+                format: int64
+                minimum: 0
+              description: Seconds to wait
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          description: Stripe, the calendar or the mail relay failed. Try again
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  schemas:
+    Availability:
+      type: object
+      description: A meeting type's free starts and terms, and the token that dates this visit's form.
+      required:
+        - slots
+        - durationMinutes
+        - priceMinor
+        - currency
+        - formToken
+      properties:
+        currency:
+          type: string
+          description: ISO 4217, in lower case.
+        durationMinutes:
+          type: integer
+          format: int32
+          minimum: 0
+        formToken:
+          type: string
+          description: 'Sent back with the booking: a form sent within seconds of this answer is refused.'
+        priceMinor:
+          type: integer
+          format: int64
+          description: The price in the currency's minor unit. 0 is free.
+        slots:
+          type: array
+          items:
+            type: string
+          description: Every bookable start, RFC 3339 in UTC, earliest first.
+    Booking:
+      type: object
+      description: A booked meeting and the two links its holder uses.
+      required:
+        - id
+        - start
+        - end
+        - icsUrl
+        - cancelUrl
+      properties:
+        cancelUrl:
+          type: string
+          description: The page that cancels the meeting.
+        end:
+          type: string
+        icsUrl:
+          type: string
+          description: The invitation exactly as emailed.
+        id:
+          type: string
+        start:
+          type: string
+    BookingRequest:
+      type: object
+      required:
+        - type
+        - start
+        - name
+        - email
+        - formToken
+      properties:
+        email:
+          type: string
+        formToken:
+          type: string
+        message:
+          type: string
+        name:
+          type: string
+        source:
+          type:
+            - string
+            - 'null'
+          description: |-
+            Where the link the visitor followed was shared (its `utm_source`), such as `reddit`: 1 to
+            32 lowercase letters, digits, dots or hyphens. Kept with the booking.
+        start:
+          type: string
+          description: One of the offered `slots`.
+        timeZone:
+          type:
+            - string
+            - 'null'
+          description: The visitor's IANA time zone, in which the email states the time.
+        type:
+          type: string
+          description: The meeting type's slug.
+        website:
+          type: string
+          description: 'A field people never see: anything in it refuses the request.'
+        withdrawalWaiver:
+          type: boolean
+          description: |-
+            For a paid type, required: the visitor asks for the session within the 14-day withdrawal
+            period and accepts losing the right of withdrawal once it is given in full.
+      additionalProperties: false
+    CancelRequest:
+      type: object
+      required:
+        - token
+      properties:
+        refund:
+          type:
+            - integer
+            - 'null'
+          format: int64
+          description: |-
+            For a paid type, the last moment the cancellation is refunded, in Unix seconds, as the
+            link names it. The token covers it.
+        token:
+          type: string
+        type:
+          type:
+            - string
+            - 'null'
+          description: |-
+            The meeting type's slug, as the cancellation link names it. A link from before types
+            were named has none. The token covers it.
+    Cancelled:
+      type: object
+      description: 'What a cancellation refunded: 0 for a free meeting, or one cancelled too late.'
+      required:
+        - refundedMinor
+        - currency
+      properties:
+        currency:
+          type: string
+          description: ISO 4217, in lower case.
+        refundedMinor:
+          type: integer
+          format: int64
+    ConfirmRequest:
+      type: object
+      description: The Checkout session the success page returns with.
+      required:
+        - sessionId
+      properties:
+        sessionId:
+          type: string
+      additionalProperties: false
+    Held:
+      type: object
+      description: A time held for its payment, and the Stripe Checkout page that pays for it.
+      required:
+        - id
+        - checkoutUrl
+        - expiresAt
+      properties:
+        checkoutUrl:
+          type: string
+          description: "Stripe's hosted Checkout page: the browser goes there."
+        expiresAt:
+          type: string
+          description: When the hold ends unpaid, RFC 3339 in UTC.
+        id:
+          type: string
+    InvalidMember:
+      type: object
+      description: One invalid member of a request, located by a JSON Pointer (RFC 6901).
+      required:
+        - pointer
+        - detail
+      properties:
+        detail:
+          type: string
+          description: What is wrong with it.
+        pointer:
+          type: string
+          description: |-
+            JSON Pointer to the member within the request body, empty for the whole body; a header or a
+            query parameter is named instead, as `header:<name>` or `query:<name>`.
+    PaymentPending:
+      type: object
+      description: 'A payment by a method that settles later: the invitation follows once it does.'
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+    Problem:
+      type: object
+      description: RFC 9457 problem details payload.
+      required:
+        - status
+        - title
+      properties:
+        detail:
+          type: string
+          description: Explanation specific to this occurrence, written to help correct the request.
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvalidMember'
+          description: |-
+            The invalid members of the request.
+
+            Present on a `validation` problem.
+        status:
+          type: integer
+          format: int32
+          description: HTTP status code.
+          minimum: 0
+        title:
+          type: string
+          description: |-
+            Short summary of the problem type.
+
+            For `about:blank`, the status phrase.
+        type:
+          type: string
+          description: |-
+            Problem type URI, which resolves to its documentation.
+
+            Absent means `about:blank`.
+    ReleaseRequest:
+      type: object
+      description: The token from Checkout's way back.
+      required:
+        - token
+      properties:
+        token:
+          type: string
+      additionalProperties: false
+security:
+  - {}

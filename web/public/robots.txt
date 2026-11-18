@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /README.md
+Sitemap: https://www.marcoferra.com/sitemap-index.xml

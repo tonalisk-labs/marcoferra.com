@@ -1,0 +1,138 @@
+[tools]
+node = "24.21.0"
+"aqua:rhysd/actionlint" = "1.7.12"
+"aqua:rust-cross/cargo-zigbuild" = "0.23.4"
+"aqua:taiki-e/cargo-llvm-cov" = "0.9.1"
+cargo-deny = "0.20.2"
+editorconfig-checker = "4.0.2"
+shellcheck = "0.11.0"
+shfmt = "3.14.1"
+vale = "3.24.0"
+zig = "0.17.0"
+zizmor = "1.32.0"
+
+[env]
+# Tasks run the tools the lockfile installed. A missing one fails, rather than npx fetching
+# whatever package has its name. npm keeps a tool in web's own node_modules when a root package
+# needs another version of one of its dependencies, as orval's get-tsconfig 4 beside astro's 5.
+_.path = ["{{config_root}}/node_modules/.bin", "{{config_root}}/web/node_modules/.bin"]
+
+# What rust-toolchain.toml pins, installed once before any task runs cargo: mise starts those tasks
+# together, and the first cargo in each would download it into the same folder.
+[tasks.toolchain]
+run = "rustup toolchain install --no-self-update"
+
+[tasks.generate]
+description = "The site's API client, from server/openapi.yaml"
+dir = "web"
+run = "orval"
+
+[tasks.sync]
+depends = ["generate"]
+dir = "web"
+run = "astro sync"
+
+# Each task is written as kit's formatter lays it out: a list that fits in a line stays on one.
+[tasks.format]
+depends = ["toolchain"]
+run = [
+  "oxfmt --check -c node_modules/@tonalisk-labs/kit/rules/oxfmt.json",
+  "shfmt --diff .",
+  "cargo fmt --check",
+]
+
+[tasks.lint]
+depends = ["sync", "toolchain"]
+run = [
+  "oxlint",
+  "editorconfig-checker",
+  "kit-lint-styles",
+  "shellcheck server/*.sh",
+  "cspell lint --no-progress .",
+  "vale web/src",
+  "knip",
+  "cargo clippy --all-targets",
+  "cargo deny check",
+]
+
+[tasks.contract]
+description = "server/openapi.yaml is the contract the server exports"
+run = """
+set -eu
+exported=$(mktemp -d)/openapi.yaml
+cargo run -q --bin export-openapi > "$exported"
+oxfmt -c node_modules/@tonalisk-labs/kit/rules/oxfmt.json "$exported" > /dev/null
+diff -u server/openapi.yaml "$exported"
+"""
+
+[tasks.typecheck]
+depends = ["sync", "toolchain"]
+run = ["tsc --noEmit -p .", "tsc --noEmit -p web", { task = "contract" }]
+
+[tasks."test:web"]
+depends = ["generate"]
+dir = "web"
+run = "kit-test"
+
+[tasks."test:server"]
+depends = ["toolchain"]
+run = "kit-test-rust"
+
+[tasks.test]
+description = "The unit tests, each held to its coverage floors"
+depends = ["test:web", "test:server"]
+
+[tasks.build]
+depends = ["generate"]
+# After the tasks that read .astro/, which the build rewrites.
+wait_for = ["lint", "typecheck"]
+dir = "web"
+run = "astro build"
+
+[tasks.site]
+description = "The built pages: valid HTML and the SEO rules"
+depends = ["build"]
+run = ["html-validate web/dist", "kit-seo --strict"]
+
+[tasks.workflows]
+# zizmor's online audits would read GitHub on every check; the offline ones, said outright.
+run = ["actionlint", "zizmor --offline --persona pedantic .github/workflows"]
+
+[tasks.audit]
+run = "npm audit --audit-level=info"
+
+[tasks.check]
+description = "Every check a pull request runs"
+depends = ["format", "lint", "typecheck", "test", "site", "workflows", "audit"]
+
+[tasks.e2e]
+description = "The site and its API in every browser, device and network of the matrix; E2E_TIER=smoke for its first row, dev for one row per engine"
+depends = ["generate"]
+run = "playwright test"
+
+[tasks.cards]
+description = "Draw the Open Graph cards"
+dir = "web"
+run = "node scripts/draw-cards.ts"
+
+[tasks.cv-pdf]
+description = "Print the CV to web/public/, and with CV_RECRUITER the full CV beside its overlay"
+dir = "web"
+# conda-forge's builds, the only ones mise reaches for both on macOS and Linux; only this task
+# installs them.
+tools = { "conda:qpdf" = "12.4.2", "conda:exiftool" = "13.59" }
+run = "node scripts/cv-pdf.ts"
+
+[tasks.release-check]
+description = "The gate before a release is attested"
+depends = ["check"]
+
+[tasks.artifacts]
+description = "The release's site.tar.gz and booking-lambda.zip, and the site for Pages"
+depends = ["build"]
+run = [
+  "rm -rf out pages && mkdir out",
+  "tar -czf out/site.tar.gz -C web/dist .",
+  "cp -R web/dist pages",
+  "sh server/build-lambda.sh out",
+]

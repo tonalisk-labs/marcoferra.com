@@ -1,0 +1,6 @@
+# An exact pin: clippy's lint set changes between patches, so every machine must agree.
+[toolchain]
+channel = "1.99.0"
+components = ["clippy", "llvm-tools", "rustfmt"]
+# The booking API runs on Lambda's arm64 Linux, as a static binary.
+targets = ["aarch64-unknown-linux-musl"]
