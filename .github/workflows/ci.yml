@@ -16,7 +16,7 @@ concurrency:
 # kit's workflow bounds each of its jobs with timeout-minutes, which a calling job can't set.
 jobs:
   checks:
-    uses: tonalisk-labs/kit/.github/workflows/checks.yml@cfafe9eddb9b08515279536929f188aeda20d8d7 # v1.1.0
+    uses: tonalisk-labs/kit/.github/workflows/checks.yml@e8636eb871366ea75d130f04276c4d6ce12af8b3 # v1.1.1-1-ge8636eb
     permissions:
       contents: read # to check out the code
       pull-requests: read # to read the pull request's title

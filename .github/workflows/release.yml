@@ -14,7 +14,7 @@ concurrency:
 # kit's workflow bounds each of its jobs with timeout-minutes, which a calling job can't set.
 jobs:
   release:
-    uses: tonalisk-labs/kit/.github/workflows/release.yml@cfafe9eddb9b08515279536929f188aeda20d8d7 # v1.1.0
+    uses: tonalisk-labs/kit/.github/workflows/release.yml@e8636eb871366ea75d130f04276c4d6ce12af8b3 # v1.1.1-1-ge8636eb
     permissions:
       contents: write # to tag and attach the release
       id-token: write # to sign the attestations
@@ -27,7 +27,7 @@ jobs:
   pages:
     needs: release
     if: needs.release.outputs.created == 'true'
-    uses: tonalisk-labs/kit/.github/workflows/pages.yml@cfafe9eddb9b08515279536929f188aeda20d8d7 # v1.1.0
+    uses: tonalisk-labs/kit/.github/workflows/pages.yml@e8636eb871366ea75d130f04276c4d6ce12af8b3 # v1.1.1-1-ge8636eb
     permissions:
       pages: write # to deploy the site
       id-token: write # to prove where the deployment comes from
