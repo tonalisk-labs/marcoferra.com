@@ -23,9 +23,6 @@ const sourcesOf = (pathname) => {
   if (name === '') {
     return ['src/pages/index.astro'];
   }
-  if (name === 'cv') {
-    return ['src/pages/cv.astro', 'src/data/cv.md'];
-  }
   if (name === 'book' || name === 'work-with-me') {
     return [`src/pages/${name === 'book' ? 'book/index' : name}.astro`, MEETINGS];
   }

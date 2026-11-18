@@ -1,8 +1,6 @@
 ---
 import { button, CARD_LINK, DISPLAY, LEAD } from '@tonalisk-labs/kit/theme';
-import { Picture } from 'astro:assets';
 
-import portrait from '../assets/marco-ferra.jpg';
 import Layout from '../layouts/layout.astro';
 import { astroNotes } from '../lib/json-ld.ts';
 
@@ -10,8 +8,8 @@ const now = [
   {
     title: 'Delivery leadership',
     text: 'I lead delivery governance and improvement in a large engineering organisation. 18+ years across four sectors.',
-    href: '/cv/',
-    cta: 'Read my CV',
+    href: '/work-with-me/#full-cv',
+    cta: 'Ask for my CV',
   },
   {
     title: 'Mentoring and advisory',
@@ -34,38 +32,19 @@ const now = [
   image="home"
   jsonLd={[astroNotes(Astro.site)]}
 >
-  <section
-    aria-labelledby="hero"
-    class="flex flex-col gap-6 py-6 sm:flex-row-reverse sm:items-center sm:justify-between"
-  >
-    <Picture
-      src={portrait}
-      formats={['avif', 'webp']}
-      fallbackFormat="jpg"
-      widths={[160, 320, 480]}
-      sizes="10rem"
-      priority
-      alt="Marco Ferra"
-      pictureAttributes={{ class: 'shrink-0' }}
-      class="size-32 rounded-full object-cover sm:size-40"
-    />
-    <div class="flex flex-col gap-6">
-      <h1 id="hero" class={DISPLAY}>
-        Marco Ferra: engineering excellence <span class="text-primary-700">and transformation</span>
-      </h1>
-      <p class={LEAD}>
-        Delivery governance, DORA metrics and Lean Six Sigma for engineering organisations at scale.
-        18 years, four sectors, and a product I build and run myself with AI.
-      </p>
-      <p class="flex flex-wrap gap-4">
-        <a href="/work-with-me/" class={button('primary', 'lg')}>
-          Work with me
-        </a>
-        <a href="/cv/" class={button('light', 'lg')}>
-          Read my CV
-        </a>
-      </p>
-    </div>
+  <section aria-labelledby="hero" class="flex flex-col gap-6 py-6">
+    <h1 id="hero" class={DISPLAY}>
+      Marco Ferra: engineering excellence <span class="text-primary-700">and transformation</span>
+    </h1>
+    <p class={LEAD}>
+      Delivery governance, DORA metrics and Lean Six Sigma for engineering organisations at scale. 18
+      years, four sectors, and a product I build and run myself with AI.
+    </p>
+    <p class="flex flex-wrap gap-4">
+      <a href="/work-with-me/" class={button('primary', 'lg')}>
+        Work with me
+      </a>
+    </p>
   </section>
 
   <section aria-labelledby="now" class="mt-8 flex flex-col gap-4">

@@ -115,14 +115,6 @@ description = "Draw the Open Graph cards"
 dir = "web"
 run = "node scripts/draw-cards.ts"
 
-[tasks.cv-pdf]
-description = "Print the CV to web/public/, and with CV_RECRUITER the full CV beside its overlay"
-dir = "web"
-# conda-forge's builds, the only ones mise reaches for both on macOS and Linux; only this task
-# installs them.
-tools = { "conda:qpdf" = "12.4.2", "conda:exiftool" = "13.59" }
-run = "node scripts/cv-pdf.ts"
-
 [tasks.release-check]
 description = "The gate before a release is attested"
 depends = ["check"]

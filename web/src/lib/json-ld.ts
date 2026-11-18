@@ -36,13 +36,9 @@ export const astroNotes = (site: URL | undefined): SoftwareApplication => ({
   creator: { '@id': personId(site) },
 });
 
-/** The author, with `image` his portrait's address, and the site on every page, and whatever the
- *  page adds about itself. The author names no employer. */
-export const siteJsonLd = (
-  site: URL | undefined,
-  image: string,
-  extra: readonly Thing[] = [],
-): string => {
+/** The author and the site on every page, and whatever the page adds about itself. The author
+ *  names no employer. */
+export const siteJsonLd = (site: URL | undefined, extra: readonly Thing[] = []): string => {
   const home = new URL('/', site).href;
   return jsonLdScript({
     '@context': 'https://schema.org',
@@ -51,7 +47,6 @@ export const siteJsonLd = (
         '@type': 'Person',
         '@id': personId(site),
         name: 'Marco Ferra',
-        image,
         jobTitle: 'Programme Manager',
         email: `mailto:${EMAIL}`,
         url: home,

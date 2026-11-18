@@ -5,7 +5,7 @@ import { expect, test } from '@tonalisk-labs/kit/testing';
 import { ROLE_TYPE } from '../src/booking/brief.ts';
 import { eventTypes } from '../src/booking/event-types.ts';
 
-const MENU = ['Home', 'CV', 'Work with me'];
+const MENU = ['Home', 'Work with me'];
 
 /** A meeting type card's link, by the name it is read out with. */
 const choose = (title: string): string => `Choose a time for: ${title}`;
@@ -26,8 +26,8 @@ const mainMenu = async (page: Page): Promise<Locator> => {
   return page.getByRole('navigation', { name: 'Main' });
 };
 
-test('the main menu reads Home, CV and Work with me, and leads there', async ({ page }) => {
-  await page.goto('/cv/');
+test('the main menu reads Home and Work with me, and leads there', async ({ page }) => {
+  await page.goto('/');
   const menu = await mainMenu(page);
   await expect(menu.getByRole('link')).toHaveText(MENU);
   await menu.getByRole('link', { name: 'Work with me', exact: true }).click();

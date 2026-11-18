@@ -14,11 +14,6 @@ export const CARDS = {
     details: ['Programme Manager', 'London'],
     alt: 'Marco Ferra: Engineering excellence and transformation. Programme Manager, London.',
   },
-  cv: {
-    title: 'CV: Programme Manager',
-    details: ['Agile delivery', 'Lean Six Sigma', 'DevOps and DORA metrics', 'SAFe'],
-    alt: 'Marco Ferra, CV: Programme Manager. Agile delivery, Lean Six Sigma, DevOps and DORA metrics, SAFe.',
-  },
   book: {
     title: 'Book a meeting',
     details: ['Choose a day and a time for a video call'],

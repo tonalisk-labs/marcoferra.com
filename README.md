@@ -1,8 +1,8 @@
 # marcoferra.com
 
-[marcoferra.com](https://www.marcoferra.com) is Marco Ferra's site: his CV, how to work with him,
-and a page to book a call. `web/` is the site, built with Astro. `server/` is its booking API, a
-Rust service on AWS Lambda.
+[marcoferra.com](https://www.marcoferra.com) is Marco Ferra's site: how to work with him, his CV on
+request, and a page to book a call. `web/` is the site, built with Astro. `server/` is its booking
+API, a Rust service on AWS Lambda.
 
 ## Run it
 

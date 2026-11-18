@@ -1,14 +1,12 @@
 ---
 import BodyFont from '@tonalisk-labs/kit/components/BodyFont.astro';
 import { button, FLOATING, POPOVER_MOTION } from '@tonalisk-labs/kit/theme';
-import { getImage } from 'astro:assets';
 import type { Thing } from 'schema-dts';
 
 import { LINK } from '../booking/classes.ts';
 import ThemeMenu from '../components/theme-menu.astro';
 import { CARDS, type CardName } from '../lib/cards.ts';
 import { EMAIL, LINKEDIN, siteJsonLd } from '../lib/json-ld.ts';
-import portraitSource from '../assets/marco-ferra.jpg';
 
 import '../styles/global.css';
 
@@ -30,12 +28,8 @@ const {
   noindex = false,
 } = Astro.props;
 
-/** The portrait as a JPEG, the format every search engine reads, for `Person.image`. */
-const portrait = await getImage({ src: portraitSource, width: 600, format: 'jpg' });
-
 const links = [
   { href: '/', label: 'Home' },
-  { href: '/cv/', label: 'CV' },
   { href: '/work-with-me/', label: 'Work with me' },
 ];
 
@@ -81,7 +75,7 @@ const linkFor = (href: string): string =>
       )
     }
     <meta name="twitter:card" content={imageUrl === undefined ? 'summary' : 'summary_large_image'} />
-    <script is:inline type="application/ld+json" set:html={siteJsonLd(Astro.site, new URL(portrait.src, Astro.site).href, jsonLd)} />
+    <script is:inline type="application/ld+json" set:html={siteJsonLd(Astro.site, jsonLd)} />
   </head>
   <body class="flex min-h-dvh flex-col bg-white text-slate-900 antialiased">
     <header class="border-b border-slate-200 print:hidden">
